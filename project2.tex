@@ -1,7 +1,3 @@
-% Template for ISBI paper; to be used with:
-%          spconf.sty  - ICASSP/ICIP LaTeX style file, and
-%          IEEEbib.bst - IEEE bibliography style file.
-% --------------------------------------------------------------------------
 \documentclass{article}
 \usepackage{spconf,amsmath,graphicx}
 
@@ -19,7 +15,7 @@
 
 % Title.
 % ------
-\title{Explorations on Natural Language Processing Techniques}
+\title{A Dual-Task Study: Life Expectancy Prediction and Sentiment Analysis of Film Reviews}
 %
 % Single address.
 % ---------------
@@ -30,283 +26,179 @@
   \{gongzl2022, lijh2022, wangcl2022, hanqj2022\}@mail.sustech.edu.cn
 }
 %
-% For example:
-% ------------
-%\address{School\\
-%	Department\\
-%	Address}
-%
-% Two addresses (uncomment and modify for two-address case).
-% ----------------------------------------------------------
-%\twoauthors
-%  {A. Author-one, B. Author-two\sthanks{Some author footnote.}}
-%	{School A-B\\
-%	Department A-B\\
-%	Address A-B}
-%  {C. Author-three, D. Author-four\sthanks{The fourth author performed the work
-%	while at ...}}
-%	{School C-D\\
-%	Department C-D\\
-%	Address C-D}
-%
-% More than two addresses
-% -----------------------
-% \name{Author Name$^{\star \dagger}$ \qquad Author Name$^{\star}$ \qquad Author Name$^{\dagger}$}
-%
-% \address{$^{\star}$ Affiliation Number One \\
-%     $^{\dagger}$}Affiliation Number Two
-%
 \begin{document}
 %\ninept
 %
 \maketitle
 %
 \begin{abstract}
-The abstract should appear at the top of the left-hand column of text, about
-0.5 inch (12 mm) below the title area and no more than 3.125 inches (80 mm) in
-length.  Leave a 0.5 inch (12 mm) space between the end of the abstract and the
-beginning of the main text.  The abstract should contain about 100 to 150
-words, and should be identical to the abstract text submitted electronically
-along with the paper cover sheet.  All manuscripts must be in English, printed
-in black ink.
+This paper presents a comprehensive study across two distinct machine learning domains. The first task focuses on predictive modeling, where we develop a model to forecast national life expectancy using a range of socio-economic and environmental indicators from 2008 to 2018. We explore various regression techniques, feature importance, and model improvement strategies. The second task delves into natural language processing, conducting sentiment analysis on Douban movie reviews. We implement and compare traditional machine learning classifiers with modern Large Language Model (LLM) approaches, evaluating their effectiveness in discerning positive from negative sentiment in textual data. This work highlights the application of diverse statistical methods to solve real-world prediction and classification problems.
 \end{abstract}
 %
 \begin{keywords}
-One, two, three, four, five
+Life Expectancy, Predictive Modeling, Sentiment Analysis, Machine Learning, Natural Language Processing, LLM
 \end{keywords}
 %
 \section{Introduction}
 \label{sec:intro}
 
-These guidelines include complete descriptions of the fonts, spacing, and
-related information for producing your proceedings manuscripts.
+This report details our work on two data science projects. 
+The first project, "Life Expectancy," involves predicting life expectancy at birth based on 12 features for 211 countries. 
+The primary objective is to train a model on data from 2008-2017 to predict life expectancy for the year 2018, 
+using the $\textit{life\_indicator\_2008-2018}$ dataset.
 
-\section{Formatting your paper}
-\label{sec:format}
+The second project, "Douban Movie Comment Analysis," aims to classify the sentiment of movie reviews from Douban as either positive or negative. This task utilizes the $\textit{douban\_movie}$ dataset. We explore both traditional machine learning techniques and the capabilities of Large Language Models (LLMs) for this text classification problem.
 
-All printed material, including text, illustrations, and charts, must be kept
-within a print area of 7 inches (178 mm) wide by 9 inches (229 mm) high. Do
-not write or print anything outside the print area. The top margin must be 1
-inch (25 mm), except for the title page, and the left margin must be 0.75 inch
-(19 mm).  All {\it text} must be in a two-column format. Columns are to be 3.39
-inches (86 mm) wide, with a 0.24 inch (6 mm) space between them. Text must be
-fully justified.
+\section{Task 1: Life Expectancy Prediction}
+\label{sec:task1}
 
-\section{Page title section}
-\label{sec:pagestyle}
+The goal of this task is to build a regression model to predict `Life expectancy at birth` using various national indicators.
 
-The paper title (on the first page) should begin 1.38 inches (35 mm) from the
-top edge of the page, centered, completely capitalized, and in Times 14-point,
-boldface type.  The authors' name(s) and affiliation(s) appear below the title
-in capital and lower case letters.  Papers with multiple authors and
-affiliations may require two or more lines for this information.
+\subsection{Data Understanding}
+\label{ssec:data_understanding}
 
-\section{Type-style and fonts}
-\label{sec:typestyle}
+The dataset contains 12 features, including `Agriculture, forestry, and fishing, value added (% of GDP)`, `GDP (current US$)`, and `Current health expenditure (% of GDP)`. We hypothesized that features related to health expenditure, immunization rates, and GDP would have a significant positive impact on life expectancy, while a high prevalence of underweight children would have a negative impact.
 
-To achieve the best rendering both in the printed and digital proceedings, we
-strongly encourage you to use Times-Roman font.  In addition, this will give
-the proceedings a more uniform look.  Use a font that is no smaller than nine
-point type throughout the paper, including figure captions.
+A correlation heatmap was generated to visualize the relationships between features. Missing data was a significant issue, and we compared several imputation methods, including mean/median filling, interpolation, and K-Nearest Neighbors (KNN) imputation.
 
-In nine point type font, capital letters are 2 mm high.  If you use the
-smallest point size, there should be no more than 3.2 lines/cm (8 lines/inch)
-vertically.  This is a minimum spacing; 2.75 lines/cm (7 lines/inch) will make
-the paper much more readable.  Larger type sizes require correspondingly larger
-vertical spacing.  Please do not double-space your paper.  True-Type 1 fonts
-are preferred.
+\textbf{TODO:} Insert the correlation heatmap figure. Discuss which imputation method was chosen and why, based on performance comparisons.
 
-The first paragraph in each section should not be indented, but all the
-following paragraphs within the section should be indented as these paragraphs
-demonstrate.
+\subsection{Modeling}
+\label{ssec:modeling_life}
 
-\section{Major headings}
-\label{sec:majhead}
+We trained and evaluated several regression models to identify the best predictor for life expectancy. The models included Linear Regression, Lasso, Ridge, Random Forest, XGBoost, and Support Vector Regression (SVR). The data from 2008 to 2017 served as the training set, and the 2018 data was used for testing.
 
-Major headings, for example, "1. Introduction", should appear in all capital
-letters, bold face if possible, centered in the column, with one blank line
-before, and one blank line after. Use a period (".") after the heading number,
-not a colon.
+Model performance was evaluated using Mean Squared Error (MSE) and the coefficient of determination ($R^2$).
 
-\subsection{Subheadings}
-\label{ssec:subhead}
+\textbf{TODO:} Present a table comparing the MSE and $R^2$ scores for each model on the 2018 test set. Analyze the results and select the best-performing model.
 
-Subheadings should appear in lower case (initial word capitalized) in
-boldface.  They should start at the left margin on a separate line.
- 
-\subsubsection{Sub-subheadings}
-\label{sssec:subsubhead}
+Feature importance was extracted from the best models (e.g., coefficients from linear models, feature importance scores from tree-based models) to identify the key drivers of life expectancy.
 
-Sub-subheadings, as in this paragraph, are discouraged. However, if you
-must use them, they should appear in lower case (initial word
-capitalized) and start at the left margin on a separate line, with paragraph
-text beginning on the following line.  They should be in italics.
+\textbf{TODO:} List the top 5 most important features and discuss whether they align with the initial hypotheses.
 
-\section{Printing your paper}
-\label{sec:print}
+\subsection{Analysis of Predictions}
+\label{ssec:analysis_preds}
 
-Print your properly formatted text on high-quality, 8.5 x 11-inch white printer
-paper. A4 paper is also acceptable, but please leave the extra 0.5 inch (12 mm)
-empty at the BOTTOM of the page and follow the top and left margins as
-specified.  If the last page of your paper is only partially filled, arrange
-the columns so that they are evenly balanced if possible, rather than having
-one long column.
+We visualized the residuals (the difference between predicted and actual values) for the 2018 data to assess the model's accuracy. Outliers, i.e., countries where the prediction error was particularly large, were identified.
 
-In \LaTeX, to start a new column (but not a new page) and help balance the
-last-page column lengths, you can use the command ``$\backslash$pagebreak'' as
-demonstrated on this page (see the \LaTeX\ source below).
+\textbf{TODO:} Include a plot of predicted vs. actual values for 2018. Identify any major outliers and provide potential explanations for the large prediction errors (e.g., unique socio-economic events in those countries in 2018). Analyze the distribution of prediction errors.
 
-\section{Page numbering}
-\label{sec:page}
+\subsection{Model Improvement}
+\label{ssec:model_improvement}
 
-Please do {\bf not} paginate your paper.  Page numbers, session numbers, and
-conference identification will be inserted when the paper is included in the
-proceedings.
+To enhance model performance, we employed stepwise forward selection to find an optimal subset of features. Additionally, we engineered new features, such as `GDP per capita` (GDP / Population), to better capture the economic status of a country.
 
-\section{Illustrations, graphs, and photographs}
-\label{sec:illust}
+\textbf{TODO:} Describe the results of the model improvement techniques. Did stepwise selection or feature engineering lead to a significant improvement in MSE or $R^2$?
 
-Illustrations must appear within the designated margins.  They may span the two
-columns.  If possible, position illustrations at the top of columns, rather
-than in the middle or at the bottom.  Caption and number every illustration.
-All halftone illustrations must be clear black and white prints.  If you use
-color, make sure that the color figures are clear when printed on a black-only
-printer.
+\section{Task 2: Douban Movie Comment Analysis}
+\label{sec:task2}
 
-Since there are many ways, often incompatible, of including images (e.g., with
-experimental results) in a \LaTeX\ document, below is an example of how to do
-this \cite{Lamp86}.
+This task focuses on binary sentiment classification of movie reviews. Reviews with star ratings of 1 or 2 were labeled as negative, while those with ratings of 3, 4, or 5 were labeled as positive.
 
-% Below is an example of how to insert images. Delete the ``\vspace'' line,
-% uncomment the preceding line ``\centerline...'' and replace ``imageX.ps''
-% with a suitable PostScript file name.
-% -------------------------------------------------------------------------
-\begin{figure}[htb]
+\subsection{Part 1: Machine Learning Approach}
+\label{ssec:ml_approach}
 
-\begin{minipage}[b]{1.0\linewidth}
-  \centering
-  \centerline{\includegraphics[width=8.5cm]{example-image}}
-%  \vspace{2.0cm}
-  \centerline{(a) Result 1}\medskip
-\end{minipage}
-%
-\begin{minipage}[b]{.48\linewidth}
-  \centering
-  \centerline{\includegraphics[width=4.0cm]{example-image}}
-%  \vspace{1.5cm}
-  \centerline{(b) Results 3}\medskip
-\end{minipage}
-\hfill
-\begin{minipage}[b]{0.48\linewidth}
-  \centering
-  \centerline{\includegraphics[width=4.0cm]{example-image}}
-%  \vspace{1.5cm}
-  \centerline{(c) Result 4}\medskip
-\end{minipage}
-%
-\caption{Example of placing a figure with experimental results.}
-\label{fig:res}
-%
-\end{figure}
+\subsubsection{Text Preprocessing}
+\label{sssec:preprocessing}
+The raw text comments were preprocessed to prepare them for vectorization. This involved tokenization (using a Chinese tokenizer like Jieba), removal of stopwords, special symbols, and low-frequency words.
 
-% To start a new column (but not a new page) and help balance the last-page
-% column length use \vfill\pagebreak.
-% -------------------------------------------------------------------------
-\vfill
-\pagebreak
+\subsubsection{Text Vectorization}
+\label{sssec:vectorization}
+We converted the cleaned text into numerical vectors using TF-IDF.
 
+\textbf{TODO (Bonus):} If Word2Vec or BERT embeddings were used, describe the process and compare the results with TF-IDF.
 
-\section{Footnotes}
-\label{sec:foot}
+\subsubsection{Model Training \& Evaluation}
+\label{sssec:ml_training}
+We trained and cross-validated Logistic Regression and Naive Bayes classifiers on an 80/20 train/test split of the data. Performance was measured using accuracy, precision, recall, and F1-score.
 
-Use footnotes sparingly (or not at all!) and place them at the bottom of the
-column on the page on which they are referenced. Use Times 9-point type,
-single-spaced. To help your readers, avoid using footnotes altogether and
-include necessary peripheral observations in the text (within parentheses, if
-you prefer, as in this sentence).
+\textbf{TODO:} Present a table with the evaluation metrics for both models. Analyze their performance and discuss their respective strengths and weaknesses for this task.
 
+\subsection{Part 2: Large Language Model (LLM) Approach}
+\label{ssec:llm_approach}
 
-\section{Copyright forms}
-\label{sec:copyright}
+\subsubsection{Prompt Design \& In-Context Learning}
+\label{sssec:prompt_design}
+To leverage LLMs for this task, we designed effective prompts. We experimented with zero-shot and few-shot learning. For few-shot learning, the prompt included examples of positive and negative reviews to guide the model. An example of a few-shot prompt structure is:
 
-You must include your fully completed, signed IEEE copyright release form when
-you submit your paper. We {\bf must} have this form before your paper can be
-published in the proceedings.  The copyright form is available as a Word file,
-a PDF file, and an HTML file. You can also use the form sent with your author
-kit.
+\begin{verbatim}
+Based on the examples, determine the sentiment of the final review.
 
-\section{Referencing}
-\label{sec:ref}
+1. Comment: The acting was superb, and the plot was engaging.
+   Sentiment: Positive
 
-List and number all bibliographical references at the end of the
-paper.  The references can be numbered in alphabetic order or in order
-of appearance in the document.  When referring to them in the text,
-type the corresponding reference number in square brackets as shown at
-the end of this sentence \cite{C2}.
+2. Comment: The special effects were terrible and the story was boring.
+   Sentiment: Negative
+
+Now analyze:
+Comment: {{review_text}}
+Sentiment:
+\end{verbatim}
+
+\subsubsection{LLM API Testing}
+\label{sssec:llm_api}
+We used the APIs for two LLMs (e.g., ChatGPT-3.5, DeepSeek) to predict the sentiment of a sample of reviews from our test set.
+
+\textbf{TODO:} Name the specific LLMs used.
+
+\subsubsection{Discussion}
+\label{sssec:discussion}
+We compared the performance of the traditional machine learning models with the LLM-based predictions.
+
+\textbf{TODO:} Compare the accuracy of the LLMs against the Logistic Regression and Naive Bayes models. Discuss the strengths and limitations of each approach. Analyze specific cases where the ML and LLM predictions differed and provide insights into why.
+
+\section{Bonus Tasks}
+\label{sec:bonus}
+
+\subsection{Task 1 Bonus: Forecasting to 2025}
+A key challenge explored was the feasibility of forecasting life expectancy for 2025. This requires extrapolating the feature trends from 2008-2018 and feeding them into the trained regression model.
+
+\textbf{TODO:} Discuss the methodology used for feature extrapolation (e.g., time series forecasting on each feature) and present the 2025 life expectancy predictions. Analyze the confidence and potential error sources of this long-range forecast.
+
+\subsection{Task 2 Bonus: Advanced NLP Exploration}
+
+\subsubsection{Advanced Data Analysis}
+We conducted further analysis on the review data. This included generating word clouds to visualize the most frequent terms in positive and negative reviews and exploring the correlation between review length and the assigned star rating.
+
+\textbf{TODO:} Insert word cloud visualizations and a plot showing the relationship between review length and rating. Discuss any insights gained.
+
+\subsubsection{LLM Prompt Optimization}
+To improve LLM performance, we tested more sophisticated prompting strategies, such as chain-of-thought and role-playing prompts, analyzing how changes in prompt phrasing affected the quality of sentiment prediction.
+
+\textbf{TODO:} Provide examples of the advanced prompts used and compare their performance to the initial few-shot prompts.
+
+\subsubsection{Fine-Tuning LLMs}
+We fine-tuned an open-source LLM (e.g., LLaMA-2) on a small subset of the Douban review data. The performance of the fine-tuned model was then compared against its pre-trained counterpart to evaluate the effectiveness of domain-specific adaptation.
+
+\textbf{TODO:} Describe the fine-tuning process and present a comparison of the model's performance before and after fine-tuning.
+
 
 \section{Compliance with ethical standards}
 \label{sec:ethics}
-
-IEEE-ISBI supports the standard requirements on the use of animal and
-human subjects for scientific and biomedical research. For all IEEE
-ISBI papers reporting data from studies involving human and/or
-animal subjects, formal review and approval, or formal review and
-waiver, by an appropriate institutional review board or ethics
-committee is required and should be stated in the papers. For those
-investigators whose Institutions do not have formal ethics review
-committees, the principles  outlined in the Helsinki Declaration of
-1975, as revised in 2000, should be followed.
-
-Reporting on compliance with ethical standards is required
-(irrespective of whether ethical approval was needed for the study) in
-the paper. Authors are responsible for correctness of the statements
-provided in the manuscript. Examples of appropriate statements
-include:
-\begin{itemize}
-  \item ``This is a numerical simulation study for which no ethical
-    approval was required.'' 
-  \item ``This research study was conducted retrospectively using
-    human subject data made available in open access by (Source
-    information). Ethical approval was not required as confirmed by
-    the license attached with the open access data.''
-    \item ``This study was performed in line with the principles of
-      the Declaration of Helsinki. Approval was granted by the Ethics
-      Committee of University B (Date.../No. ...).''
-\end{itemize}
-
+This research study \cite{LeCun98} was conducted using publicly available data. The life expectancy data is aggregated at a country level, and the movie review data is anonymized. Therefore, no formal ethics approval was required for this study.
 
 \section{Acknowledgments}
 \label{sec:acknowledgments}
-
-IEEE-ISBI supports the disclosure of financial support for the project
-as well as any financial and personal relationships of the author that
-could create even the appearance of bias in the published work. The
-authors must disclose any agency or individual that provided financial
-support for the work as well as any personal or financial or
-employment relationship between any author and the sources of
-financial support for the work.
-
-Other types of acknowledgements can also be listed in this section.
-
-Reporting on real or potential conflicts of interests, or the absence
-thereof, is required in the paper. Authors are responsible for
-correctness of the statements provided in the manuscript. Examples of
-appropriate statements include:
-\begin{itemize}
-  \item ``No funding was received for conducting this study. The
-    authors have no relevant financial or non-financial interests to
-    disclose.'' 
-  \item ``This work was supported by […] (Grant numbers) and
-    […]. Author X has served on advisory boards for Company Y.'' 
-  \item ``Author X is partially funded by Y. Author Z is a Founder and
-    Director for Company C.''
-\end{itemize}
+No external funding was received for conducting this study. The authors have no relevant financial or non-financial interests to disclose.
 
 % References should be produced using the bibtex program from suitable
 % BiBTeX files (here: strings, refs, manuals). The IEEEbib.bst bibliography
 % style file from IEEE produces unsorted bibliography list.
-% ------------------------------------------------------------------------- 
+% -------------------------------------------------------------------------
 \bibliographystyle{IEEEbib}
-\bibliography{strings,refs}
+% \bibliography{strings,refs}
+\begin{thebibliography}{99}
+
+  \bibitem{LeCun98}
+  Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner,
+  \newblock ``Gradient-based learning applied to document recognition,''
+  \newblock {\em Proceedings of the IEEE}, vol. 86, no. 11, pp. 2278--2324, 1998.
+  
+  \bibitem{Maaten08}
+  L. van der Maaten and G. Hinton,
+  \newblock ``Visualizing data using t-SNE,''
+  \newblock {\em Journal of Machine Learning Research}, vol. 9, pp. 2579--2605, 2008.
+  
+  \end{thebibliography}
 
 \end{document}

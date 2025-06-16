@@ -17,9 +17,6 @@
 *.snm
 *.vrb
 
-# Build output
-*.pdf
-
 # OS-specific files
 .DS_Store
 Thumbs.db
