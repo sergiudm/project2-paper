@@ -3,6 +3,9 @@
 \usepackage{listings} % For code blocks
 \usepackage{xcolor} % For code coloring
 \usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 % Configure code style
 \lstset{
     language=Python,
@@ -27,6 +30,9 @@
 \renewcommand{\bottomfraction}{0.95}
 \renewcommand{\textfraction}{0}
 \renewcommand{\floatpagefraction}{0.85}
+\usepackage{booktabs}
+\usepackage{multirow}
+
 
 % It's fine to compress itemized lists if you used them in the
 % manuscript
@@ -59,11 +65,17 @@
 \maketitle
 %
 \begin{abstract}
-This paper presents a comprehensive study across two distinct machine learning domains. The first task focuses on predictive modeling, where we develop a model to forecast national life expectancy using a range of socio-economic and environmental indicators from 2008 to 2018. We explore various regression techniques, feature importance, and model improvement strategies. The second task delves into natural language processing, conducting sentiment analysis on Douban movie reviews. We implement and compare traditional machine learning classifiers with modern Large Language Model (LLM) approaches, evaluating their effectiveness in discerning positive from negative sentiment in textual data. This work highlights the application of diverse statistical methods to solve real-world prediction and classification problems.
+This paper presents a comprehensive study across two distinct machine learning domains. The first task 
+focuses on predictive modeling, where we develop a model to forecast national life expectancy using a
+ range of socio-economic and environmental indicators from 2008 to 2018. We explore various regression 
+ techniques, feature importance, and model improvement strategies. The second task delves into natural 
+ language processing, conducting sentiment analysis on Douban movie reviews. We implement and compare 
+ traditional machine learning classifiers with modern Large Language Model (LLM) approaches, evaluating 
+ their effectiveness in discerning positive from negative sentiment in textual data. This work highlights the application of diverse statistical methods to solve real-world prediction and classification problems.
 \end{abstract}
 %
 \begin{keywords}
-Life Expectancy, Predictive Modeling, Sentiment Analysis, Machine Learning, Natural Language Processing, LLM
+Life Expectancy, Sentiment Analysis, Natural Language Processing, Large Language Model
 \end{keywords}
 %
 \section{Introduction}
@@ -106,13 +118,15 @@ To understand the data, we performed exploratory data analysis (EDA) using Pytho
     \label{tab:desc_stats}
 \end{table}
 
-A correlation heatmap was generated to visualize the relationships between features. Missing data was a significant issue, and we compared several imputation methods, including mean/median filling, interpolation, and K-Nearest Neighbors (KNN) imputation.
+A correlation heatmap was generated to visualize the relationships between features. Missing data 
+was a significant issue, and we compared several imputation methods, including mean/median filling, 
+interpolation, and K-Nearest Neighbors (KNN) \cite{Cover1967} imputation.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.a.2.png} % Assuming the image is in a 'pic' subdirectory
     \caption{Correlation heatmap of features in the life expectancy dataset.}
-    \label{fig:correlation_heatmap}
+    \label{fig:correlation_heatmap7}
 \end{figure}
 
 we drow the distribution of life expectancy in 2018.
@@ -360,13 +374,13 @@ our model is better than the previous one.
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.3.png} % Assuming the image is in a 'pic' subdirectory
     \caption{good result}
-    \label{fig:correlation_heatmap}
+    \label{fig:correlation_heatmap1}
 \end{figure}
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.4.png} % Assuming the image is in a 'pic' subdirectory
     \caption{good result}
-    \label{fig:correlation_heatmap}
+    \label{fig:correlation_heatmap2}
 \end{figure}
 \subsection*{Bonus}
 
@@ -374,40 +388,94 @@ our model is better than the previous one.
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.bonus.1.png} % Assuming the image is in a 'pic' subdirectory
     \caption{good result}
-    \label{fig:correlation_heatmap}
+    \label{fig:correlation_heatmap3}
 \end{figure}
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.bonus.2.png} % Assuming the image is in a 'pic' subdirectory
     \caption{good result}
-    \label{fig:correlation_heatmap}
+    \label{fig:correlation_heatmap4}
 \end{figure}
 
 
 \section{Task 2: Douban Movie Comment Analysis}
 \label{sec:task2}
 
-This task focuses on binary sentiment classification of movie reviews. Reviews with star ratings of 1 or 2 were labeled as negative, while those with ratings of 3, 4, or 5 were labeled as positive.
+This task focuses on binary sentiment classification of movie reviews. Reviews with star ratings 
+of 1 or 2 were labeled as negative, while those with ratings of 3, 4, or 5 were labeled as positive.
 
 \subsection{Part 1: Machine Learning Approach}
 \label{ssec:ml_approach}
 
 \subsubsection{Text Preprocessing}
 \label{sssec:preprocessing}
-The raw text comments were preprocessed to prepare them for vectorization. This involved tokenization (using a Chinese tokenizer like Jieba), removal of stopwords, special symbols, and low-frequency words.
+The raw text comments were preprocessed to prepare them for vectorization. 
+This involved tokenization (using a Chinese tokenizer like Jieba), removal of stopwords, special symbols, 
+and low-frequency words.
+The Python code for preprocessing is as follows:
+\begin{lstlisting}[language=Python]
+def preprocess_text(text):
+    if not isinstance(text, str):
+        return ""
+    text = text.replace("\n", " ")
+    text = re.sub(r"[^\u4e00-\u9fa5]", "", text)
+    text = text.lower()
+    words = jieba.lcut(text)
+    words = [word for word in words if word not in CHINESE_STOPWORDS and len(word) > 1]
+    return " ".join(words)
+\end{lstlisting}
 
 \subsubsection{Text Vectorization}
 \label{sssec:vectorization}
-We converted the cleaned text into numerical vectors using TF-IDF.
+Text vectorization refers to the process of converting text data into numerical vectors. 
+This is necessary for machine learning models to understand and process the text. 
+In this project, we used Term Frequency-Inverse Document Frequency (TF-IDF) , Word2Vec, and BERT embeddings 
+to convert the text into vectors. We further compared the results of the three vectorization methods.
 
-\textbf{TODO (Bonus):} If Word2Vec or BERT embeddings were used, describe the process and compare the results with TF-IDF.
 
 \subsubsection{Model Training \& Evaluation}
 \label{sssec:ml_training}
-We trained and cross-validated Logistic Regression and Naive Bayes classifiers on an 80/20 train/test split of the data. Performance was measured using accuracy, precision, recall, and F1-score.
+We trained and cross-validated Logistic Regression and Naive Bayes classifiers on an 80/20 train/test 
+split of the data. Performance was measured using accuracy, precision, recall, and F1-score.
 
-\textbf{TODO:} Present a table with the evaluation metrics for both models. Analyze their performance and discuss their respective strengths and weaknesses for this task.
+\begin{table}[h!]
+\centering
+\caption{Transposed Performance Metrics Across Models and Vectorizers}
+\label{tab:model_performance_transposed}
+\fontsize{7pt}{12pt}\selectfont
+\begin{tabular}{lrrrrrr}
+\toprule
+& \multicolumn{2}{c}{\textbf{BERT}} & \multicolumn{2}{c}{\textbf{TF-IDF}} & \multicolumn{2}{c}{\textbf{Word2Vec}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+\textbf{Metric} & \textbf{GNB} & \textbf{LogReg} & \textbf{LogReg} & \textbf{MultiNB} & \textbf{GNB} & \textbf{LogReg} \\
+\midrule
+Accuracy & 0.658 & 0.726 & 0.786 & 0.866 & 0.792 & 0.782 \\
+Precision (Loved) & 0.906 & 0.931 & 0.946 & 0.872 & 0.924 & 0.943 \\
+Recall (Loved) & 0.655 & 0.723 & 0.787 & 0.983 & 0.816 & 0.784 \\
+F1 (Loved) & 0.760 & 0.814 & 0.859 & 0.924 & 0.867 & 0.856 \\
+CV F1 (Macro) & 0.580 & 0.646 & 0.712 & 0.672 & 0.699 & 0.700 \\
+\bottomrule
+\multicolumn{7}{l}{\textit{GNB: Gaussian NB, LogReg: Logistic Regression, MultiNB: Multinomial NB}}
+\end{tabular}
+\end{table}
+
+From Table \ref{tab:model_performance_transposed}, we observe:
+\begin{itemize}
+    \item \textbf{Best Overall Performance:} The \texttt{TF-IDF} vectorizer paired with a \texttt{Multinomial NB} classifier achieved the highest performance on several key metrics, including the best overall accuracy (\texttt{0.866}) and the highest F1-Score for the "Loved" class (\texttt{0.924}). This indicates it is exceptionally effective at identifying this specific class.
+
+    \item \textbf{Most Robust and Generalizable Model:} While \texttt{TF-IDF} had the highest single-class F1-Score, the \texttt{Word2Vec} models showed the best generalization. Both \texttt{Word2Vec} combinations yielded the highest cross-validated F1-Macro scores (approx. \texttt{0.700}). This suggests that \texttt{Word2Vec} models provide the most balanced and reliable performance across all classes when tested on unseen data folds.
+
+    \item \textbf{Precision vs. Recall Trade-off:} A classic precision-recall trade-off is evident between the two \texttt{TF-IDF} models.
+    \begin{itemize}
+        \item The \texttt{Multinomial NB} model provides extraordinary recall (\texttt{0.983}) at the cost of lower precision (\texttt{0.872}). This model is ideal if the goal is to find \textit{almost all} instances of the "Loved" class, even if it means some incorrect classifications.
+        \item Conversely, the \texttt{Logistic Regression} model offers elite precision (\texttt{0.946}) but lower recall (\texttt{0.787}). This model is superior when the cost of a false positive is high, as its predictions for the "Loved" class are highly reliable.
+    \end{itemize}
+
+    \item \textbf{Underperformance of BERT Embeddings:} In this configuration, using pre-trained \texttt{BERT} embeddings with simple classifiers like \texttt{Gaussian NB} and \texttt{Logistic Regression} resulted in the lowest performance across the board. The \texttt{BERT + Gaussian NB} model was the weakest combination overall, highlighting that advanced embeddings do not guarantee superior results without a suitable downstream model or further fine-tuning.
+
+    \item \textbf{Consistency of Logistic Regression:} \texttt{Logistic Regression} proved to be a consistently strong and versatile classifier, performing well with all three vectorization techniques (\texttt{BERT}, \texttt{TF-IDF}, and \texttt{Word2Vec}).
+\end{itemize}
 
 \subsection{Part 2: Large Language Model (LLM) Approach}
 \label{ssec:llm_approach}
@@ -594,12 +662,87 @@ As shown in Figure \ref{fig:advanced_prompts}, these strategies yielded mixed re
     \item Both methods improved output standardization and reliability
 \end{itemize}
 
-Error analysis (Figure \ref{fig:error_analysis}) revealed that while overall accuracy didn't improve substantially, the nature of errors shifted toward more ambiguous cases where even human raters disagreed on sentiment classification.
+Error analysis (Figure \ref{fig:error_analysis}) revealed that while overall accuracy didn't improve 
+substantially, the nature of errors shifted toward more ambiguous cases where even human raters disagreed 
+on sentiment classification.
 
+\subsection{Fine-Tuning LLMs}
+\label{ssec:fine_tuning}
+Qwen3-8B is a generative model, which was trained to predict the next token in a sentence. However, for sentiment
+analysis, it is more reasonable to use an encoder model to predict the sentiment of a given sequence of tokens.
+In this work, we concatenate a light weight MLP on top of Qwen3-8B and fine-tune it on the 
+Douban movie review dataset for sentiment analysis with 2 epochs. The fine-tuning process is shown in 
+Algorithm \ref{alg:fine_tuning}.
 
-\section{Compliance with ethical standards}
-\label{sec:ethics}
-This research study \cite{LeCun98} was conducted using publicly available data. The life expectancy data is aggregated at a country level, and the movie review data is anonymized. Therefore, no formal ethics approval was required for this study.
+\begin{algorithm}[H]
+\caption{Fine-Tuning Qwen3-8B for Sentiment Analysis using LoRA}
+\label{alg:fine_tuning}
+\begin{algorithmic}[1]
+\Require 
+    Dataset path $D_{path}$ (e.g., \texttt{douban\_movie.csv}),
+    Base model name $M_{name}$ (e.g., \texttt{Qwen/Qwen3-8B}),
+    Hyperparameters $H = \{ \text{learning\_rate, epochs, batch\_size, etc.} \}$,
+    LoRA parameters $P_{LoRA} = \{ r, \alpha, \text{target\_modules} \}$
+
+\Ensure 
+    Trained LoRA adapter weights $W_{LoRA}$
+
+\Statex
+\Function{PrepareData}{$D_{path}$}
+    \State $D_{csv} \gets \text{LoadCSV}(D_{path})$
+    \State $D_{formatted} \gets \text{EmptyList}$
+    \For{each row $(\text{comment, star\_rating})$ in $D_{csv}$}
+        \If{$\text{star\_rating} \ge 3$}
+            \State $\text{sentiment\_label} \gets \text{"positive"}$
+        \Else
+            \State $\text{sentiment\_label} \gets \text{"negative"}$
+        \EndIf
+        \State $\text{prompt} \gets \text{Format instruction prompt with comment and sentiment\_label}$
+        \State Append $(\text{prompt} + \text{EOS\_TOKEN})$ to $D_{formatted}$
+    \EndFor
+    \State $D_{HF} \gets \text{Convert } D_{formatted} \text{ to Hugging Face Dataset}$
+    \State $D_{train}, D_{test} \gets \text{SplitDataset}(D_{HF}, \text{ratio}=0.9)$
+    \State \Return $D_{train}, D_{test}$
+\EndFunction
+
+\Statex
+\State $D_{train}, D_{test} \gets \text{\textsc{PrepareData}}(D_{path})$
+\State $M_{base}, T \gets \text{FastLanguageModel.from\_pretrained}(M_{name})$ \Comment{Load model and tokenizer}
+\State \Comment{Apply 4-bit quantization via \texttt{load\_in\_4bit=True}}
+\If{$T.\text{pad\_token}$ is None}
+    \State $T.\text{pad\_token} \gets T.\text{eos\_token}$
+\EndIf
+
+\State $M_{lora} \gets \text{FastLanguageModel.get\_peft\_model}(M_{base}, P_{LoRA})$ \Comment{Inject trainable LoRA adapters}
+\State $Args_{train} \gets \text{TrainingArguments}(H)$ \Comment{Configure training parameters}
+\State $Trainer \gets \text{SFTTrainer}(model=M_{lora}, tokenizer=T, train\_dataset=D_{train}, args=Args_{train})$
+\State $Trainer.\text{train}()$ \Comment{Execute fine-tuning; only $W_{LoRA}$ are updated}
+\State $M_{lora}.\text{save\_pretrained}(\text{output\_dir})$ \Comment{Save the trained LoRA adapter weights $W_{LoRA}$}
+\State $T.\text{save\_pretrained}(\text{output\_dir})$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Evaluation}
+\label{ssec:evaluation}
+
+We evaluate the fine-tuned Qwen3-8B model on the test set using the process described in 
+Algorithm \ref{alg:fine_tuning}.
+We report the evaluation metrics of the fine-tuned model per epoch on the test set.
+
+\begin{table}[H]
+\centering
+\caption{Evaluation metrics of the fine-tuned Qwen3-8B model per epoch on the test set. The model from Epoch 2 demonstrates the best performance.}
+\label{tbl:eval_results}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Epoch} & \textbf{Loss} & \textbf{Accuracy} & \textbf{F1-Score} \\ \midrule
+1 & 0.3074& 0.9059 & 0.9451 \\
+\textbf{2} & \textbf{0.2875} & \textbf{0.9126} & \textbf{0.9477} \\
+\end{tabular}
+\end{table}
+
+From Table \ref{tbl:eval_results}, we observe that the fine-tuned model from Epoch 2 demonstrates the best 
+performance, with an accuracy of 0.9126 and an F1-Score of 0.9477.
 
 \section{Acknowledgments}
 \label{sec:acknowledgments}
@@ -609,20 +752,9 @@ No external funding was received for conducting this study. The authors have no 
 % BiBTeX files (here: strings, refs, manuals). The IEEEbib.bst bibliography
 % style file from IEEE produces unsorted bibliography list.
 % -------------------------------------------------------------------------
-\bibliographystyle{IEEEbib}
+\bibliographystyle{IEEEtran}
 % \bibliography{strings,refs}
-\begin{thebibliography}{99}
+\bibliography{refs}
 
-  \bibitem{LeCun98}
-  Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner,
-  \newblock ``Gradient-based learning applied to document recognition,''
-  \newblock {\em Proceedings of the IEEE}, vol. 86, no. 11, pp. 2278--2324, 1998.
-  
-  \bibitem{Maaten08}
-  L. van der Maaten and G. Hinton,
-  \newblock ``Visualizing data using t-SNE,''
-  \newblock {\em Journal of Machine Learning Research}, vol. 9, pp. 2579--2605, 2008.
-  
-  \end{thebibliography}
 
 \end{document}
