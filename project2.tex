@@ -129,15 +129,17 @@ interpolation, and K-Nearest Neighbors (KNN) \cite{Cover1967} imputation.
     \label{fig:correlation_heatmap7}
 \end{figure}
 
-we drow the distribution of life expectancy in 2018.
+we drew the distribution of life expectancy in 2018.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.a.3.png} % Assuming the image is in a 'pic' subdirectory
     \caption{Distribution of life expectancy in 2018.}
     \label{fig:life_expectancy_distribution}
 \end{figure}
-Missing data was a significant issue, and we compared several imputation methods, including mean/median filling, interpolation, and K-Nearest Neighbors (KNN) imputation.
-figure below shows the degree of missing data. 
+
+Missing data was a significant issue, and we compared several imputation methods, including mean/median filling, interpolation, 
+and KNN imputation.
+The figure below shows the degree of missing data. 
 \begin{table}[h]
     \centering
     \caption{Missing Value Statistics for Features}
@@ -161,8 +163,6 @@ figure below shows the degree of missing data.
     \end{tabularx} % <--- 修改这里
 \end{table}
 
-comparing the missing value imputation methods.
-
 \begin{table}[h]
     \centering
     \caption{Comparison of Missing Value Imputation Methods - Current health expenditure (\% of GDP)}
@@ -181,7 +181,8 @@ comparing the missing value imputation methods.
 
 
 
-Based on the missing value tables and feature correlation heatmap, the following five features were selected for further analysis:
+Based on the missing value tables and feature correlation heatmap, the following five 
+features were selected for further analysis:
 
 \begin{itemize}
     \item \textbf{School enrollment, secondary (\% net)}
@@ -233,7 +234,10 @@ Based on the missing value tables and feature correlation heatmap, the following
 \subsection{Modeling}
 \label{ssec:modeling_life}
 
-We trained and evaluated several regression models to identify the best predictor for life expectancy. The models included Linear Regression, Lasso, Ridge, Random Forest, XGBoost, and Support Vector Regression (SVR). The data from 2008 to 2017 served as the training set, and the 2018 data was used for testing.
+We trained and evaluated several regression models to identify the best predictor for life expectancy. 
+The models include Linear Regression, Random Forest \cite{Breiman2001}, XGBoost \cite{Friedman2001}, and 
+Support Vector Regression (SVR) \cite{Drucker1997}. The data from 2008 to 2017 served as the training set,
+ and the 2018 data was used for evaluation.
 
 \subsection*{Mean Squared Error (MSE)}
 
@@ -411,7 +415,7 @@ of 1 or 2 were labeled as negative, while those with ratings of 3, 4, or 5 were 
 \subsubsection{Text Preprocessing}
 \label{sssec:preprocessing}
 The raw text comments were preprocessed to prepare them for vectorization. 
-This involved tokenization (using a Chinese tokenizer like Jieba), removal of stopwords, special symbols, 
+This involved tokenization (using a Chinese tokenizer like Jieba \cite{Jieba2012}), removal of stopwords, special symbols, 
 and low-frequency words.
 The Python code for preprocessing is as follows:
 \begin{lstlisting}[language=Python]
@@ -430,13 +434,14 @@ def preprocess_text(text):
 \label{sssec:vectorization}
 Text vectorization refers to the process of converting text data into numerical vectors. 
 This is necessary for machine learning models to understand and process the text. 
-In this project, we used Term Frequency-Inverse Document Frequency (TF-IDF) , Word2Vec, and BERT embeddings 
+In this project, we used Term Frequency-Inverse Document Frequency (TF-IDF) \cite{SparckJones1972} , Word2Vec \cite{Mikolov2013}, 
+and BERT embeddings \cite{Devlin2019}
 to convert the text into vectors. We further compared the results of the three vectorization methods.
 
 
 \subsubsection{Model Training \& Evaluation}
 \label{sssec:ml_training}
-We trained and cross-validated Logistic Regression and Naive Bayes classifiers on an 80/20 train/test 
+We trained and cross-validated Logistic Regression \cite{Cox1958} and Naive Bayes classifiers \cite{Bishop2006} on an 80/20 train/test 
 split of the data. Performance was measured using accuracy, precision, recall, and F1-score.
 
 \begin{table}[h!]
@@ -522,8 +527,8 @@ The few-shot approach provides contextual learning cues that help the LLM unders
 
 We evaluated two LLMs through their API interfaces:
 \begin{itemize}
-    \item \textbf{Qwen3-4b}: A 4-billion parameter open-source model developed by Alibaba
-    \item \textbf{GPT-3.5 Turbo}: OpenAI's widely-used commercial model
+    \item \textbf{Qwen3-4b \cite{yang2025qwen3technicalreport}}: A 4-billion parameter open-source model developed by Alibaba
+    \item \textbf{GPT-3.5 Turbo \cite{OpenAI2023}}: OpenAI's widely-used commercial model
 \end{itemize}
 
 Performance was measured on a balanced test set of 200 reviews using accuracy as the primary metric. The results demonstrate significant performance differences between models and prompt strategies:
@@ -613,7 +618,8 @@ Figure \ref{fig:length_analysis} reveals distinct patterns between rating catego
 We implemented advanced prompting strategies to enhance LLM performance:
 
 \textbf{Chain-of-Thought (CoT) Prompting:}
-Guides the model through explicit reasoning steps before delivering the final judgment.
+Chain-of-Thought prompting guides the model to explicitly reason through the problem-solving steps, 
+enhancing accuracy and reliability \cite{Wei2022}. 
 
 \begin{lstlisting}[caption={Chain-of-Thought prompt design}]
 def create_chain_of_thought_prompt(review: str) -> str:
@@ -632,7 +638,7 @@ Sentiment judgment: [ONLY "positive" or "negative"]
     return prompt
 \end{lstlisting}
 
-\textbf{Role-Playing Prompting:}
+\textbf{Role-Playing Prompting \cite{Shan2023} :}
 Frames the task within a specific professional context to focus the model's responses.
 
 \begin{lstlisting}[caption={Role-Playing prompt design}]
@@ -671,8 +677,9 @@ on sentiment classification.
 Qwen3-8B is a generative model, which was trained to predict the next token in a sentence. However, for sentiment
 analysis, it is more reasonable to use an encoder model to predict the sentiment of a given sequence of tokens.
 In this work, we concatenate a light weight MLP on top of Qwen3-8B and fine-tune it on the 
-Douban movie review dataset for sentiment analysis with 2 epochs. The fine-tuning process is shown in 
-Algorithm \ref{alg:fine_tuning}.
+Douban movie review dataset for sentiment analysis with 2 epochs. We use PEFT library \cite{Houlsby2019} which supports 
+quantization-aware low-rank adapters \cite{Dettmers2023} to fine-tune the model.
+The fine-tuning process is shown in Algorithm \ref{alg:fine_tuning}.
 
 \begin{algorithm}[H]
 \caption{Fine-Tuning Qwen3-8B for Sentiment Analysis using LoRA}
@@ -743,6 +750,35 @@ We report the evaluation metrics of the fine-tuned model per epoch on the test s
 
 From Table \ref{tbl:eval_results}, we observe that the fine-tuned model from Epoch 2 demonstrates the best 
 performance, with an accuracy of 0.9126 and an F1-Score of 0.9477.
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper presented a dual-task study that successfully applied machine learning methodologies to two 
+distinct and challenging domains: the prediction of national life expectancy and the sentiment analysis 
+of film reviews. Our work underscores the versatility and power of modern data science techniques in 
+extracting meaningful insights from diverse data types, ranging from structured socio-economic indicators 
+to unstructured textual content.
+
+In the first task, we developed a robust regression model to forecast life expectancy. Our findings 
+confirmed that a country's socio-economic health, particularly School enrollment, and public health 
+infrastructure, evidenced by Immunization, measles, are paramount predictors. The study highlighted the
+ criticality of methodical data preprocessing and feature engineering, demonstrating that the inclusion 
+ of derived features like GDP per capita and careful feature selection significantly enhanced model performance. 
+ The Random Forest Regressor emerged as the superior model, achieving a high R-squared value of 0.9124, 
+ indicating its strong predictive power and ability to capture complex, non-linear relationships within 
+ the data. While the long-range forecast to 2025 presents a valuable projection, it also serves as a 
+ reminder of the inherent uncertainties in extrapolating complex global trends.
+
+For the second task, our comparative analysis of sentiment classification on Douban movie reviews 
+revealed a nuanced performance landscape. Traditional machine learning models, specifically Multinomial
+Naive Bayes with TF-IDF vectorization, proved to be remarkably effective and efficient, achieving a high accuracy of 0.87. 
+This highlights that well-established methods remain highly competitive for certain NLP tasks. 
+Concurrently, our exploration into Large Language Models demonstrated their strong potential, 
+with a fine-tuned Qwen3-8B model setting the performance benchmark at 0.91 accuracy. 
+The progression from zero-shot and few-shot prompting to advanced strategies like Chain-of-Thought 
+and ultimately to fine-tuning illustrated a clear path to harnessing the power of LLMs.
 
 \section{Acknowledgments}
 \label{sec:acknowledgments}
