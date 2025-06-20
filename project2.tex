@@ -2,7 +2,7 @@
 \usepackage{spconf,amsmath,graphicx}
 \usepackage{listings} % For code blocks
 \usepackage{xcolor} % For code coloring
-
+\usepackage{tabularx}
 % Configure code style
 \lstset{
     language=Python,
@@ -80,42 +80,310 @@ The second project, "Douban Movie Comment Analysis," aims to classify the sentim
 \label{sec:task1}
 
 The goal of this task is to build a regression model to predict `Life expectancy at birth` using various national indicators.
-
 \subsection{Data Understanding}
 \label{ssec:data_understanding}
 
-The dataset contains 12 features, including `Agriculture, forestry, and fishing, value added (% of GDP)`, `GDP (current US$)`, and `Current health expenditure (% of GDP)`. We hypothesized that features related to health expenditure, immunization rates, and GDP would have a significant positive impact on life expectancy, while a high prevalence of underweight children would have a negative impact.
+The dataset contains 12 features, including `Agriculture, forestry, and fishing, value added (\% of GDP)`, `GDP (current US\$)`, and `Current health expenditure (\% of GDP)`. We hypothesized that features related to health expenditure, immunization rates, and GDP would have a significant positive impact on life expectancy, while a high prevalence of underweight children would have a negative impact.
+
+To understand the data, we performed exploratory data analysis (EDA) using Python libraries such as Pandas and Matplotlib. The dataset was loaded, and basic statistics were computed to summarize the features.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|r|}
+        \hline
+        \textbf{Statistic} & \textbf{Value} \\
+        \hline
+        count & 194.000000 \\
+        mean & 11.387296 \\
+        std & 11.445366 \\
+        min & 0.019907 \\
+        25\% & 2.321262 \\
+        50\% & 7.645451 \\
+        75\% & 16.655000 \\
+        max & 58.035747 \\
+        \hline
+    \end{tabular}
+    \caption{Descriptive statistics of a feature.}
+    \label{tab:desc_stats}
+\end{table}
 
 A correlation heatmap was generated to visualize the relationships between features. Missing data was a significant issue, and we compared several imputation methods, including mean/median filling, interpolation, and K-Nearest Neighbors (KNN) imputation.
 
-\textbf{TODO:} Insert the correlation heatmap figure. Discuss which imputation method was chosen and why, based on performance comparisons.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.a.2.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{Correlation heatmap of features in the life expectancy dataset.}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
+we drow the distribution of life expectancy in 2018.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.a.3.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{Distribution of life expectancy in 2018.}
+    \label{fig:life_expectancy_distribution}
+\end{figure}
+Missing data was a significant issue, and we compared several imputation methods, including mean/median filling, interpolation, and K-Nearest Neighbors (KNN) imputation.
+figure below shows the degree of missing data. 
+\begin{table}[h]
+    \centering
+    \caption{Missing Value Statistics for Features}
+    \label{tab:missing_values}
+    \begin{tabularx}{\columnwidth}{|>{\raggedright\arraybackslash}X|r|r|} % <--- 修改这里
+        \hline
+        \textbf{Feature} & \textbf{Missing Values} & \textbf{Percentage (\%)} \\
+        \hline
+        Prevalence of (under)weight for age & 1758 & 83.714286 \\
+        Income held by lowest 20\% & 1300 & 61.904762 \\
+        R \& D expenditure (\% of GDP) & 1166 & 55.523810 \\
+        School enrollment, secondary  & 1018 & 48.476190 \\
+        Annual freshwater withdrawals, total  & 348 & 16.571429 \\
+        Current health expenditure  & 267 & 12.714286 \\
+        Immunization, measles  & 213 & 10.142857 \\
+        Agriculture, forestry added... & 144 & 6.857143 \\
+        Industry value added ... & 132 & 6.285714 \\
+        GDP (current US\$) & 69 & 3.285714 \\
+        Forest area (\% of land area) & 42 & 2.000000 \\
+        \hline
+    \end{tabularx} % <--- 修改这里
+\end{table}
+
+comparing the missing value imputation methods.
+
+\begin{table}[h]
+    \centering
+    \caption{Comparison of Missing Value Imputation Methods - Current health expenditure (\% of GDP)}
+    \label{tab:imputation_comparison_health_exp}
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{Imputation Method} & \textbf{Mean} & \textbf{Standard Deviation} & \textbf{Skewness} & \textbf{Missing Rate (\%)} \\
+        \hline
+        Deletion & 6.035173 & 2.919142 & 1.615525 & 0.0 \\
+        Mean Imputation & 6.035173 & 2.724067 & 1.728760 & 0.0 \\
+        Median Imputation & 5.960549 & 2.731019 & 1.797122 & 0.0 \\
+        KNN Imputation & 6.035173 & 2.724067 & 1.728760 & 0.0 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+
+Based on the missing value tables and feature correlation heatmap, the following five features were selected for further analysis:
+
+\begin{itemize}
+    \item \textbf{School enrollment, secondary (\% net)}
+    \begin{itemize}
+        \item \textbf{Reasoning}:
+        \item \textit{High Correlation with Target Variable}: In the correlation heatmap, this feature shows a correlation coefficient of 0.85 with "Life expectancy at birth, total (years)," which is the highest positive correlation among all features. This indicates a very strong positive relationship between higher secondary school enrollment and higher life expectancy.
+        \item \textit{Interpretability}: Education level is generally associated with health awareness, improved living conditions, and socio-economic status, all of which are important factors influencing life expectancy.
+    \end{itemize}
+
+    \item \textbf{Agriculture, forestry, and fishing, value added (\% of GDP)}
+    \begin{itemize}
+        \item \textbf{Reasoning}:
+        \item \textit{High Negative Correlation with Target Variable}: This feature has a correlation coefficient of -0.66 with life expectancy, making it one of the strongest negative correlations. This suggests that countries where primary industries like agriculture constitute a larger percentage of the GDP may have relatively lower life expectancy.
+        \item \textit{Interpretability}: This might reflect the country's stage of economic development. Typically, as nations transition from agriculture-dominant economies to industrial and service-based economies, overall living standards and healthcare conditions improve, thereby increasing life expectancy.
+    \end{itemize}
+
+    \item \textbf{Immunization, measles (\% of children ages 12-23 months)}
+    \begin{itemize}
+        \item \textbf{Reasoning}:
+        \item \textit{Strong Positive Correlation with Target Variable}: With a correlation coefficient of 0.58 with life expectancy, this feature shows a strong positive relationship. This implies that higher child immunization coverage significantly and positively impacts the overall health and life expectancy of the population.
+        \item \textit{Interpretability}: Immunization is a critical component of basic healthcare, effectively preventing fatal diseases and directly contributing to lower child mortality rates and improved overall population health.
+    \end{itemize}
+
+    \item \textbf{GDP (current US\$)}
+    \begin{itemize}
+        \item \textbf{Reasoning}:
+        \item \textit{Relatively Complete Data and Moderate Correlation}: Although its correlation coefficient with life expectancy (0.21) is moderate to weak, the missing value pattern shows that GDP has relatively few missing values. Compared to other features with slightly higher correlations but more severe missing data (e.g., "Research and development expenditure"), GDP offers better data quality and usability.
+        \item \textit{Interpretability}: GDP is an important indicator of a country's overall economic strength. Generally, more economically developed countries can invest more resources in healthcare, education, and improving living environments, thereby directly or indirectly increasing life expectancy.
+    \end{itemize}
+
+    \item \textbf{Current health expenditure (\% of GDP)}
+    \begin{itemize}
+        \item \textbf{Reasoning}:
+        \item \textit{Direct Relevance and Acceptable Data Quality}: This feature has a correlation coefficient of 0.27 with life expectancy, showing a moderate positive correlation. It directly reflects a country's investment in the health sector.
+        \item \textit{Interpretability}: Health expenditure is a direct factor influencing national health levels and healthcare accessibility. Higher health expenditure usually means better medical facilities, more healthcare personnel, and broader medical coverage, all of which contribute to extending life expectancy. Moreover, its missing data situation is better than features like "Prevalence of underweight" or "Research and development expenditure."
+    \end{itemize}
+\end{itemize}
+
+\textbf{Overall Rationale for Feature Selection}:
+\begin{itemize}
+    \item \textbf{Strength of Correlation with Target Variable}: Priority was given to features with higher absolute correlation coefficients.
+    \item \textbf{Data Completeness}: Considering the missing value patterns, features with fewer missing values or those whose missing data are relatively easier to handle were preferred. Features with excessive missing data are less practical, even if highly correlated.
+    \item \textbf{Interpretability and Domain Knowledge}: Selected features should have a logical basis for their relationship with life expectancy.
+\end{itemize}
+
+
+
 
 \subsection{Modeling}
 \label{ssec:modeling_life}
 
 We trained and evaluated several regression models to identify the best predictor for life expectancy. The models included Linear Regression, Lasso, Ridge, Random Forest, XGBoost, and Support Vector Regression (SVR). The data from 2008 to 2017 served as the training set, and the 2018 data was used for testing.
 
-Model performance was evaluated using Mean Squared Error (MSE) and the coefficient of determination ($R^2$).
+\subsection*{Mean Squared Error (MSE)}
 
-\textbf{TODO:} Present a table comparing the MSE and $R^2$ scores for each model on the 2018 test set. Analyze the results and select the best-performing model.
+\textbf{Definition}
 
-Feature importance was extracted from the best models (e.g., coefficients from linear models, feature importance scores from tree-based models) to identify the key drivers of life expectancy.
+MSE calculates the average of the squared differences between predicted and actual values:
+\begin{equation}
+    \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+\end{equation}
+Where, $y_i$ is the actual value, $\hat{y}_i$ is the predicted value, and $n$ is the number of samples.
 
-\textbf{TODO:} List the top 5 most important features and discuss whether they align with the initial hypotheses.
+\textbf{Significance}
+\begin{itemize}
+    \item Measures the absolute error of the prediction: MSE directly reflects the degree of deviation between the model's predicted value and the actual value. A smaller value indicates a more accurate model.
+\end{itemize}
+
+\subsection*{ R-squared ($R^2$)}
+
+\textbf{Definition}
+
+$R^2$ measures the proportion of the variance in the target variable that is predictable from the independent variables. It typically ranges from $(-\infty, 1]$:
+\begin{equation}
+    R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
+\end{equation}
+Where, $\bar{y}$ is the mean of the actual values.
+
+\textbf{Significance}
+\begin{itemize}
+    \item \textbf{Proportion of Variance Explained}: $R^2$ indicates the degree of improvement of the model compared to a simple mean prediction. For example, an $R^2=0.8$ means the model explains 80\% of the variability in the target variable.
+    \item \textbf{Dimensionless}: $R^2$ is independent of the data scale, facilitating cross-task comparisons.
+    \item \textbf{Baseline Comparison}: If $R^2$ is close to 1, it indicates a good model fit; if it is 0, the model is no better than predicting the mean; if it is negative, the model performs worse than predicting the mean.
+\end{itemize}
+
+
 
 \subsection{Analysis of Predictions}
 \label{ssec:analysis_preds}
 
-We visualized the residuals (the difference between predicted and actual values) for the 2018 data to assess the model's accuracy. Outliers, i.e., countries where the prediction error was particularly large, were identified.
+\subsection*{Comparison of MSE and R-squared}
 
-\textbf{TODO:} Include a plot of predicted vs. actual values for 2018. Identify any major outliers and provide potential explanations for the large prediction errors (e.g., unique socio-economic events in those countries in 2018). Analyze the distribution of prediction errors.
+When evaluating regression models, both Mean Squared Error (MSE) and R-squared ($R^2$) offer valuable insights, each with distinct advantages:
+
+\textbf{Advantages of Mean Squared Error (MSE):}
+\begin{itemize}
+    \item \textbf{Intuitive Error Metric:} MSE represents the average of the squared differences between predicted and actual values. Its square root, Root Mean Squared Error (RMSE), is in the same units as the target variable, making it easy to understand the average magnitude of the prediction error. For instance, if predicting house prices, an RMSE of \$10,000 means the model's predictions are, on average, \$10,000 away from the actual prices.
+    \item \textbf{Sensitivity to Large Errors:} Due to the squaring of errors, MSE is more sensitive to large errors or outliers. This can be beneficial if large prediction errors are particularly undesirable for the specific application, as MSE will heavily penalize models that produce them.
+    \item \textbf{Good Mathematical Properties:} MSE is a convex function and is differentiable everywhere. These properties make it well-suited for many optimization algorithms, such as gradient descent, which are often used to train machine learning models by minimizing MSE.
+\end{itemize}
+
+\textbf{Advantages of R-squared ($R^2$):}
+\begin{itemize}
+    \item \textbf{Standardized Metric:} $R^2$ values typically range from 0 to 1 (though they can be negative if the model is worse than a horizontal line). A value of 0 indicates the model does not explain any more variance than a simple mean, while a value of 1 indicates a perfect fit. This standardized scale makes it easier to compare model performance across different datasets or when the target variables have different scales.
+    \item \textbf{Proportion of Variance Explained:} $R^2$ quantifies the proportion of the total variance in the dependent variable that is predictable from the independent variables. For example, an $R^2$ of 0.80 means that 80\% of the variability in the target variable can be explained by the model's inputs. This provides a relative measure of the model's "goodness of fit."
+    \item \textbf{Dimensionless:} $R^2$ is a dimensionless metric, meaning it is not tied to the units of the target variable. This makes it more accessible for interpretation by a broader audience and facilitates comparisons across different tasks or domains.
+\end{itemize}
+
+\textbf{Test on different model}
+\begin{table}[h]
+    \centering
+    \caption{Model Performance Comparison on Test Data}
+    \label{tab:model_performance}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Model} & \textbf{Test MSE} & \textbf{Test R²} \\
+        \hline
+        Linear Regression (SFS) & 23.9793 & 0.5812 \\
+        Linear Regression (All Features) & 24.0069 & 0.5807 \\
+        Random Forest Regressor & 5.0259 & 0.9122 \\
+        Gradient Boosting Regressor & 10.1853 & 0.8221 \\
+        Support Vector Regressor (SVR) & 18.2409 & 0.6814 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+if the primary concern is the absolute magnitude of prediction errors and penalizing large errors heavily, MSE (or RMSE) is more appropriate. If the focus is on understanding the proportion of variance explained by the model or comparing models across different scales, $R^2$ is generally preferred. In practice, it is often beneficial to consider both metrics, along with others, for a comprehensive model evaluation.
+
+Model performance was evaluated using Mean Squared Error (MSE) and the Feature importance was extracted from the best models (e.g., coefficients from linear models, feature importance scores from tree-based models) to identify the key drivers of life expectancy.
+
+
+
+We visualized the residuals (the difference between predicted and actual values) for the 2018 data to assess the model's accuracy. Outliers, i.e., countries where the prediction error was particularly large, were identified.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.b.1.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{Residuals of the linear regression model for 2018 predictions.}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.b.2.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{linear regression residuals for 2018 predictions.}
+    \label{fig:correlation_heatmap}
+\end{figure}
 
 \subsection{Model Improvement}
 \label{ssec:model_improvement}
 
+first, we want to see error distribution of the model.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.c.1.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{error distribution of the model.}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
+
 To enhance model performance, we employed stepwise forward selection to find an optimal subset of features. Additionally, we engineered new features, such as `GDP per capita` (GDP / Population), to better capture the economic status of a country.
 
-\textbf{TODO:} Describe the results of the model improvement techniques. Did stepwise selection or feature engineering lead to a significant improvement in MSE or $R^2$?
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.c.2.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{new hearmap}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
+our model is better than the previous one.
+
+\begin{table}[h]
+    \centering
+    \caption{Model Performance After Feature Engineering and Selection}
+    \label{tab:model_performance_improved}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Model} & \textbf{Test MSE} & \textbf{Test R²} \\
+        \hline
+        Linear Regression (SFS) & 20.0604 & 0.6496 \\
+        Linear Regression (All Features) & 20.0161 & 0.6504 \\
+        Random Forest Regressor & 5.0165 & 0.9124 \\
+        Gradient Boosting Regressor & 7.6088 & 0.8671 \\
+        Support Vector Regressor (SVR) & 14.4522 & 0.7476 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.c.3.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{good result}
+    \label{fig:correlation_heatmap}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.c.4.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{good result}
+    \label{fig:correlation_heatmap}
+\end{figure}
+\subsection*{Bonus}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.bonus.1.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{good result}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.bonus.2.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{good result}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
 
 \section{Task 2: Douban Movie Comment Analysis}
 \label{sec:task2}
