@@ -280,10 +280,6 @@ Where, $\bar{y}$ is the mean of the actual values.
 \end{itemize}
 
 
-
-\subsection{Analysis of Predictions}
-\label{ssec:analysis_preds}
-
 \subsection*{Comparison of MSE and R-squared}
 
 When evaluating regression models, both Mean Squared Error (MSE) and R-squared ($R^2$) offer valuable insights, each with distinct advantages:
@@ -303,11 +299,9 @@ When evaluating regression models, both Mean Squared Error (MSE) and R-squared (
 \end{itemize}
 
 
-In our settings, model performance was evaluated using Mean Squared Error (MSE) and the Feature importance was
- extracted from the best models (e.g., coefficients from linear models, feature importance scores 
- from tree-based models) to identify the key drivers of life expectancy.
-
 \subsection{Test on different model}
+In our settings, model performance was evaluated using Mean Squared Error (MSE) and the Feature importance was
+ extracted from the best models (shown in Fig \ref{fig:featureimportance}) to identify the key drivers of life expectancy.
 
 \begin{table}[h]
     \centering
@@ -326,23 +320,37 @@ In our settings, model performance was evaluated using Mean Squared Error (MSE) 
     \end{tabular}
 \end{table}
 
-We visualized the residuals (the difference between predicted and actual values) for the 2018 data to assess the model's accuracy. Outliers, i.e., countries where the prediction error was particularly large, were identified.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.b.1.png} % Assuming the image is in a 'pic' subdirectory
-    \caption{Residuals of the linear regression model for 2018 predictions.}
-    \label{fig:correlation_heatmap}
+    \caption{Feature importance of the linear regression model for 2018 predictions.}
+    \label{fig:featureimportance}
 \end{figure}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\columnwidth]{./pic/T1.b.2.png} % Assuming the image is in a 'pic' subdirectory
-    \caption{linear regression residuals for 2018 predictions.}
-    \label{fig:correlation_heatmap}
-\end{figure}
+From the table, the \textbf{Random Forest Regressor} unequivocally demonstrated the most superior predictive 
+performance. It yielded the lowest Mean Squared
+ Error (MSE=5.0259) and the highest Coefficient of Determination ($R ^2 =0.9122$). 
+ This $R^2$ value indicates that the model successfully accounts for 91.22\% of the variance within the 
+ dependent variable, signifying an exceptionally strong goodness-of-fit and high generalization capability.
 
-\subsection{Model Improvement}
-\label{ssec:model_improvement}
+In comparison, the \textbf{Gradient Boosting Regressor} also exhibited a robust performance, with an $R^2$
+  of 0.8221, positioning it as a strong but secondary model. The \textbf{Support Vector Regressor (SVR)} 
+  achieved a moderate level of accuracy ($R^2=0.6814$), outperforming the linear models but falling 
+  considerably short of the ensemble methods.
+Conversely, both the \textbf{Linear Regression} models exhibited substantially limited predictive capacity, 
+with $R^2$ values of approximately 0.58. The marginal difference between the model using all features 
+and the one employing Sequential Forward Selection (SFS) suggests that the primary limitation is not the 
+feature set, but the inherent linearity of the model. The pronounced underperformance of these linear models 
+strongly implies that the underlying relationships between the independent and dependent variables are 
+predominantly non-linear.
+
+In conclusion, the empirical evidence strongly supports the selection of the 
+\textbf{Random Forest Regressor} as the optimal model for this task. The superior performance of 
+the tree-based ensemble methods highlights their effectiveness in capturing the complex, non-linear 
+patterns inherent in the dataset.
+
+\subsection{Analysis of Predictions}
+\label{ssec:analysis_preds}
 
 First, we want to see error distribution of the model. To achieve that, we use the histogram of the residuals
 shown in Fig.~\ref{fig:correlation_heatmapc}.
@@ -353,6 +361,20 @@ shown in Fig.~\ref{fig:correlation_heatmapc}.
     \caption{error distribution of the model.}
     \label{fig:correlation_heatmapc}
 \end{figure}
+
+Furthermore, we visualized the residuals (the difference between predicted and actual values) for the 2018 data 
+to assess the model's accuracy. Outliers, i.e., countries where the prediction error was particularly 
+large, were identified.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{./pic/T1.b.2.png} % Assuming the image is in a 'pic' subdirectory
+    \caption{linear regression residuals for 2018 predictions.}
+    \label{fig:correlation_heatmap}
+\end{figure}
+
+
+\subsection{Model Improvement}
+\label{ssec:model_improvement}
 
 
 To enhance model performance, we employed stepwise forward selection(SFS) \cite{Efroymson1960} to find an optimal subset 
@@ -365,6 +387,8 @@ to better capture the economic status of a country.
     \caption{new heatmap}
     \label{fig:correlation_heatmap}
 \end{figure}
+
+From the results in Table \ref{tab:model_performance_improved}, we observe that our model is better than the previous one.
 
 \begin{table}[h]
     \centering
@@ -383,20 +407,20 @@ to better capture the economic status of a country.
     \end{tabular}
 \end{table}
 
-From the results, we observe that our model is better than the previous one.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.3.png} % Assuming the image is in a 'pic' subdirectory
     \caption{Feature importances after SFS}
-    \label{fig:correlation_heatmap1}
+    \label{fig:aftersfs}
 \end{figure}
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.4.png} % Assuming the image is in a 'pic' subdirectory
     \caption{Feature importance of gradient boost regressor}
     \label{fig:correlation_heatmap2}
 \end{figure}
+
 \subsection*{Bonus}
 A key challenge explored was the feasibility of forecasting life expectancy for 2025. 
 This requires extrapolating the feature trends from 2008-2018 and feeding them into the trained regression model.
