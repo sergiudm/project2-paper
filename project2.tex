@@ -67,11 +67,12 @@
 \begin{abstract}
 This paper presents a comprehensive study across two distinct machine learning domains. The first task 
 focuses on predictive modeling, where we develop a model to forecast national life expectancy using a
- range of socio-economic and environmental indicators from 2008 to 2018. We explore various regression 
- techniques, feature importance, and model improvement strategies. The second task delves into natural 
- language processing, conducting sentiment analysis on Douban movie reviews. We implement and compare 
- traditional machine learning classifiers with modern Large Language Model (LLM) approaches, evaluating 
- their effectiveness in discerning positive from negative sentiment in textual data. This work highlights the application of diverse statistical methods to solve real-world prediction and classification problems.
+range of socio-economic and environmental indicators from 2008 to 2018. We explore various regression 
+techniques, feature importance, and model improvement strategies. The second task delves into natural 
+language processing, conducting sentiment analysis on Douban movie reviews. We implement and compare 
+traditional machine learning classifiers with modern Large Language Model (LLM) approaches, evaluating 
+their effectiveness in discerning positive from negative sentiment in textual data. This work highlights the 
+application of diverse statistical methods to solve real-world prediction and classification problems.
 \end{abstract}
 %
 \begin{keywords}
@@ -82,22 +83,28 @@ Life Expectancy, Sentiment Analysis, Natural Language Processing, Large Language
 \label{sec:intro}
 
 This report details our work on two data science projects. 
-The first project, "Life Expectancy," involves predicting life expectancy at birth based on 12 features for 211 countries. 
+The first project, "Life Expectancy Prediction", involves predicting life expectancy at birth based on 12 features for 211 countries. 
 The primary objective is to train a model on data from 2008-2017 to predict life expectancy for the year 2018, 
 using the $\textit{life\_indicator\_2008-2018}$ dataset.
 
-The second project, "Douban Movie Comment Analysis," aims to classify the sentiment of movie reviews from Douban as either positive or negative. This task utilizes the $\textit{douban\_movie}$ dataset. We explore both traditional machine learning techniques and the capabilities of Large Language Models (LLMs) for this text classification problem.
+The second project, "Douban Movie Comment Analysis", aims to classify the sentiment of movie reviews from 
+Douban as either positive or negative. This task utilizes the $\textit{douban\_movie}$ dataset. We explore both traditional machine learning techniques and the capabilities of Large Language Models (LLMs) for this text classification problem.
 
 \section{Task 1: Life Expectancy Prediction}
 \label{sec:task1}
 
-The goal of this task is to build a regression model to predict `Life expectancy at birth` using various national indicators.
+The goal of this task is to build a regression model to predict "Life expectancy at birth" using various 
+national indicators.
 \subsection{Data Understanding}
 \label{ssec:data_understanding}
 
-The dataset contains 12 features, including `Agriculture, forestry, and fishing, value added (\% of GDP)`, `GDP (current US\$)`, and `Current health expenditure (\% of GDP)`. We hypothesized that features related to health expenditure, immunization rates, and GDP would have a significant positive impact on life expectancy, while a high prevalence of underweight children would have a negative impact.
+The dataset contains 12 features, including `Agriculture, forestry, and fishing, value added 
+(\% of GDP), GDP (current in US dollar), and `Current health expenditure (\% of GDP)`. We hypothesized that 
+features related to health expenditure, immunization rates, and GDP would have a significant positive 
+impact on life expectancy, while a high prevalence of underweight children would have a negative impact.
 
-To understand the data, we performed exploratory data analysis (EDA) using Python libraries such as Pandas and Matplotlib. The dataset was loaded, and basic statistics were computed to summarize the features.
+To understand the data, we performed exploratory data analysis (EDA) using Python libraries such as Pandas 
+and Matplotlib. The dataset was loaded, and basic statistics were computed to summarize the features.
 \begin{table}[h]
     \centering
     \begin{tabular}{|l|r|}
@@ -165,6 +172,7 @@ The figure below shows the degree of missing data.
 
 \begin{table}[h]
     \centering
+    \fontsize{5pt}{10pt}
     \caption{Comparison of Missing Value Imputation Methods - Current health expenditure (\% of GDP)}
     \label{tab:imputation_comparison_health_exp}
     \begin{tabular}{|l|c|c|c|c|}
@@ -294,7 +302,13 @@ When evaluating regression models, both Mean Squared Error (MSE) and R-squared (
     \item \textbf{Dimensionless:} $R^2$ is a dimensionless metric, meaning it is not tied to the units of the target variable. This makes it more accessible for interpretation by a broader audience and facilitates comparisons across different tasks or domains.
 \end{itemize}
 
-\textbf{Test on different model}
+
+In our settings, model performance was evaluated using Mean Squared Error (MSE) and the Feature importance was
+ extracted from the best models (e.g., coefficients from linear models, feature importance scores 
+ from tree-based models) to identify the key drivers of life expectancy.
+
+\subsection{Test on different model}
+
 \begin{table}[h]
     \centering
     \caption{Model Performance Comparison on Test Data}
@@ -311,12 +325,6 @@ When evaluating regression models, both Mean Squared Error (MSE) and R-squared (
         \hline
     \end{tabular}
 \end{table}
-
-if the primary concern is the absolute magnitude of prediction errors and penalizing large errors heavily, MSE (or RMSE) is more appropriate. If the focus is on understanding the proportion of variance explained by the model or comparing models across different scales, $R^2$ is generally preferred. In practice, it is often beneficial to consider both metrics, along with others, for a comprehensive model evaluation.
-
-Model performance was evaluated using Mean Squared Error (MSE) and the Feature importance was extracted from the best models (e.g., coefficients from linear models, feature importance scores from tree-based models) to identify the key drivers of life expectancy.
-
-
 
 We visualized the residuals (the difference between predicted and actual values) for the 2018 data to assess the model's accuracy. Outliers, i.e., countries where the prediction error was particularly large, were identified.
 \begin{figure}[h]
@@ -336,26 +344,27 @@ We visualized the residuals (the difference between predicted and actual values)
 \subsection{Model Improvement}
 \label{ssec:model_improvement}
 
-first, we want to see error distribution of the model.
+First, we want to see error distribution of the model. To achieve that, we use the histogram of the residuals
+shown in Fig.~\ref{fig:correlation_heatmapc}.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.1.png} % Assuming the image is in a 'pic' subdirectory
     \caption{error distribution of the model.}
-    \label{fig:correlation_heatmap}
+    \label{fig:correlation_heatmapc}
 \end{figure}
 
 
-To enhance model performance, we employed stepwise forward selection to find an optimal subset of features. Additionally, we engineered new features, such as `GDP per capita` (GDP / Population), to better capture the economic status of a country.
+To enhance model performance, we employed stepwise forward selection(SFS) \cite{Efroymson1960} to find an optimal subset 
+of features. Additionally, we engineered new features, such as `GDP per capita` (GDP / Population), 
+to better capture the economic status of a country.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.2.png} % Assuming the image is in a 'pic' subdirectory
-    \caption{new hearmap}
+    \caption{new heatmap}
     \label{fig:correlation_heatmap}
 \end{figure}
-
-our model is better than the previous one.
 
 \begin{table}[h]
     \centering
@@ -374,19 +383,24 @@ our model is better than the previous one.
     \end{tabular}
 \end{table}
 
+From the results, we observe that our model is better than the previous one.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.3.png} % Assuming the image is in a 'pic' subdirectory
-    \caption{good result}
+    \caption{Feature importances after SFS}
     \label{fig:correlation_heatmap1}
 \end{figure}
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\columnwidth]{./pic/T1.c.4.png} % Assuming the image is in a 'pic' subdirectory
-    \caption{good result}
+    \caption{Feature importance of gradient boost regressor}
     \label{fig:correlation_heatmap2}
 \end{figure}
 \subsection*{Bonus}
+
+We use the trained model to predict the life expectancy of the countries in 2025.
+The results are shown in Fig.~\ref{fig:correlation_heatmap3} and Fig.~\ref{fig:correlation_heatmap4}.
 
 \begin{figure}[h]
     \centering
@@ -586,7 +600,7 @@ We conducted comprehensive EDA to uncover patterns in the review data:
 \textbf{Word Frequency Analysis:} 
 
 Word clouds visualize the most frequent terms in positive and negative reviews 
-(Figure \ref{fig:wordclouds}). High-frequency functional words like (de) and (le) dominate 
+(Figure \ref{fig:wordclouds}) \cite{Zipf1949}. High-frequency functional words like (de) and (le) dominate 
 but carry no sentiment value. After stopword removal, sentiment-bearing terms emerge clearly.
 
 \begin{figure}[h]
