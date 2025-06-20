@@ -718,7 +718,7 @@ The fine-tuning process is shown in Algorithm \ref{alg:fine_tuning}.
         \Else
             \State $\text{sentiment\_label} \gets \text{"negative"}$
         \EndIf
-        \State $\text{prompt} \gets \text{Format instruction prompt with comment and sentiment\_label}$
+        \State $\text{prompt} \gets \text{Prompt with comment and sentiment\_label}$
         \State Append $(\text{prompt} + \text{EOS\_TOKEN})$ to $D_{formatted}$
     \EndFor
     \State $D_{HF} \gets \text{Convert } D_{formatted} \text{ to Hugging Face Dataset}$
