@@ -6,3 +6,8 @@ Please refer to the [IEEE Author Center](https://ieeeauthorcenter.ieee.org/publi
 
 # Licence
 This material is subject to the LaTeX Project Public License. See http://www.ctan.org/license/lppl1.3 for the details of that license.
+
+
+
+# LJH 6.20 15:23
+ Task 1 中的bonus自行填写含义，我没有做不知道你们想表达什么；task 1 中的模型提升那一块。多选了4个维度的数据来提升模型性能，为什么这么选，需要填写；请做task1的同学认证核对所有task 1的文字信息
